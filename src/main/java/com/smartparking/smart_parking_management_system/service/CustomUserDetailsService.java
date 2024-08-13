@@ -20,7 +20,7 @@ public class CustomUserDetailsService implements UserDetailsService  {
         Optional<User> user=userRepository.findByUsername(username);
         user.orElseThrow(()-> new UsernameNotFoundException("User Not Found:"+username));
         return user.map(CustomUserDetails::new).get();
-
+ 
 
         
     }
