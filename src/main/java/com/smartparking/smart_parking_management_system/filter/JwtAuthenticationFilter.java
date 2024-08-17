@@ -3,11 +3,14 @@ package com.smartparking.smart_parking_management_system.filter;
 import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.endpoint.SecurityContext;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.filter.OncePerRequestFilter;
-
 import com.smartparking.smart_parking_management_system.service.CustomUserDetailsService;
 import com.smartparking.smart_parking_management_system.util.JwtUtil;
-
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -43,6 +46,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         else{
             logger.warn("JWT Token does not begin with Bearer String");
         }
+        if(username!=null&& SecurityContextHolder.getContext().getAuthentication()==null){
+           UserDetails userDetails=customUserDetailsService.loadUserByUsername(username);
+
+           if(jwtUtil.validateToken(jwtToken, userDetails)){
+            UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken=new UsernamePasswordAuthenticationToken(userDetails,null, userDetails.getAuthorities());
+            //usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+    
+
+           }
+        }
+        filterChain.doFilter(request,response);
 
 
     }   
