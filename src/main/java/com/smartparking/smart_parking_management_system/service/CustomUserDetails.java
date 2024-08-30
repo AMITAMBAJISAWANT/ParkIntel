@@ -14,7 +14,7 @@ import com.smartparking.smart_parking_management_system.model.User;
 public class CustomUserDetails implements UserDetails {
 
     private User user;
-
+    
     public CustomUserDetails(User user){
         this.user=user;
     }
