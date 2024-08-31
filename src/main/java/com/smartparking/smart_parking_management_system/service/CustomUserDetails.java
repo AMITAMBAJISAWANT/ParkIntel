@@ -8,15 +8,18 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import com.smartparking.smart_parking_management_system.model.User;
+import com.smartparking.smart_parking_management_system.model.User1;
 
 @Service
 public class CustomUserDetails implements UserDetails {
 
-    private User user;
+   private User1 user;
     
-    public CustomUserDetails(User user){
+    public CustomUserDetails(User1 user){
         this.user=user;
+    }
+    public CustomUserDetails(){
+
     }
 
     @Override

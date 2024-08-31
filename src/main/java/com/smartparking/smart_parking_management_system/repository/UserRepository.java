@@ -4,11 +4,11 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.smartparking.smart_parking_management_system.model.User;
+import com.smartparking.smart_parking_management_system.model.User1;
 
 
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface UserRepository extends JpaRepository<User1, Long> {
     
-    Optional<User> findByUsername(String username);
+    Optional<User1> findByUsername(String username);
 
 }
