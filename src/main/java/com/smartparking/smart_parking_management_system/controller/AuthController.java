@@ -43,7 +43,13 @@ public class AuthController {
     user.setUsername(userRegistrationDTO.getUsername());
     user.setPassword(passwordEncoder.encode(userRegistrationDTO.getPassword()));
 
-    Role role = new Role();
+    Role role = roleRepository.findByName("User"); 
+    // if (role == null) {
+    //     // If the role does not exist, create and save it
+    //     role = new Role();
+    //     role.setName("User");
+    //     roleRepository.save(role);
+    // }
     user.getRoles().add(role);
     userRepository.save(user);
 
@@ -51,13 +57,13 @@ public class AuthController {
 
     }
     @PostMapping("/login")
-    public String login(@RequestBody UserRegistrationDTO userRegistrationDTO){
+    public ResponseEntity<String> login(@RequestBody UserRegistrationDTO userRegistrationDTO){
         Authentication authentication = authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(userRegistrationDTO.getUsername(), userRegistrationDTO.getPassword()));
            SecurityContextHolder.getContext().setAuthentication(authentication);
            UserDetails userDetails= (UserDetails) authentication.getPrincipal();
            String jwt=jwtUtil.generateToken(userDetails);
-           return null;
+           return ResponseEntity.ok(jwt);
         
     }
     
