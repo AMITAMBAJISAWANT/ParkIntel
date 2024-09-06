@@ -18,7 +18,7 @@ public class ParkingSpotService  {
         return parkingSpotRepository.save(parkingSpot);
     }
 
-    public Optional<ParkingSpot> getParkingSpot(Long id){
+    public Optional<ParkingSpot> getParkingSpotById(Long id){
         return parkingSpotRepository.findById(id);
     }
 
