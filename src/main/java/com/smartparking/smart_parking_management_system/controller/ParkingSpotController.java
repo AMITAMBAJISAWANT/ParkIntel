@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,7 +19,7 @@ import com.smartparking.smart_parking_management_system.model.ParkingSpot;
 import com.smartparking.smart_parking_management_system.service.ParkingSpotService;
 
 @RestController
-@RequestMapping("//parkingspots")
+@RequestMapping("/parkingspots")
 public class ParkingSpotController {
 
     @Autowired
@@ -41,7 +42,7 @@ public class ParkingSpotController {
     public ParkingSpot createParkingSpot(@RequestBody ParkingSpot parkingSpot){
         return parkingSpotService.saveParkingSpot(parkingSpot);
     }
-    @PutMapping("/id")
+    @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('Admin')")
     public ResponseEntity<ParkingSpot> updateParkingSpot(@PathVariable Long id,@RequestBody ParkingSpot parkingSpotDetails){
     Optional<ParkingSpot> parkingSpot = parkingSpotService.getParkingSpotById(id);
@@ -55,11 +56,16 @@ public class ParkingSpotController {
         return ResponseEntity.notFound().build();
      }
     }
-
-
-
-
-
-    
-
+      @DeleteMapping("/{id}")
+      @PreAuthorize("hasAuthority('Admin')")
+     public ResponseEntity<Void> deleteParkingSpot(@PathVariable Long id){
+        Optional<ParkingSpot> parkingSpot = parkingSpotService.getParkingSpotById(id);
+        if(parkingSpot.isPresent()){
+            parkingSpotService.deleteParkingSpot(id);
+            return ResponseEntity.noContent().build();
+        }
+        else{
+            return ResponseEntity.notFound().build();
+        }
+     }
 }

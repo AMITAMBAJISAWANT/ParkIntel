@@ -3,10 +3,12 @@ package com.smartparking.smart_parking_management_system.config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -20,6 +22,7 @@ import com.smartparking.smart_parking_management_system.service.CustomUserDetail
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
@@ -44,8 +47,10 @@ public class SecurityConfig {
         http.csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
                         .requestMatchers("/auth/register", "/auth/login").permitAll()
-                        .requestMatchers("/user/**").hasAnyAuthority("User", "Admin")
+                        .requestMatchers("/user/**").hasAnyAuthority("Admin", "User")
                         .requestMatchers("/admin/**").hasAuthority("Admin")
+                        .requestMatchers("/parkingspots/**").hasAnyAuthority("Admin", "User")
+                        .requestMatchers("/error").permitAll()  
                         .anyRequest().authenticated())
                        
                 .sessionManagement(sessionManagement -> sessionManagement
