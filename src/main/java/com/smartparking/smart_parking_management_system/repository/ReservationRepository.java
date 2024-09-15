@@ -12,6 +12,5 @@ import com.smartparking.smart_parking_management_system.model.User1;
 public interface ReservationRepository extends JpaRepository<Reservation,Long>  {
     List<Reservation> findByUser(User1 user);
     List<Reservation> findByParkingSpot(ParkingSpot parkingSpot );
-
     
 }
