@@ -50,6 +50,7 @@ public class SecurityConfig {
                         .requestMatchers("/user/**").hasAnyAuthority("Admin", "User")
                         .requestMatchers("/admin/**").hasAuthority("Admin")
                         .requestMatchers("/parkingspots/**").hasAnyAuthority("Admin", "User")
+                        .requestMatchers(("/reservations/**")).hasAnyAuthority("Admin","User")
                         .requestMatchers("/error").permitAll()  
                         .anyRequest().authenticated())
                        
