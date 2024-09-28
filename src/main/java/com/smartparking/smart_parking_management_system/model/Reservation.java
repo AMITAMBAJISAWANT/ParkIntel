@@ -30,7 +30,9 @@ public class Reservation  {
     @JoinColumn(name="user_id")
     private User1 user;
 
-    private LocalDateTime reservationTime;
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
+   
 
     
 }

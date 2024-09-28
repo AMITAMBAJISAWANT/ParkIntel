@@ -1,5 +1,6 @@
 package com.smartparking.smart_parking_management_system.controller;
 import java.util.List;
+import java.time.LocalDateTime;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -7,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.smartparking.smart_parking_management_system.dto.ReservationRequest;
 import com.smartparking.smart_parking_management_system.model.Reservation;
 import com.smartparking.smart_parking_management_system.service.ReservationService;
 
@@ -28,9 +30,22 @@ public class ReservationController  {
      
     @PostMapping("/create")
     //@PreAuthorize("hasAuthority('User')")
-    public ResponseEntity<Reservation> createReservation(@RequestParam Long userId,@RequestParam Long parkingSpotId ){
-        Reservation reservation =reservationService.createReservation(userId, parkingSpotId);
-        return new ResponseEntity<>(reservation,HttpStatus.OK);
+    public ResponseEntity<?> createReservation(@RequestBody ReservationRequest reservationRequest ){
+        try{
+            LocalDateTime requestedStartTime = LocalDateTime.parse(reservationRequest.getStartTime());
+            Reservation reservation =reservationService.createReservation(
+            reservationRequest.getUserId(),
+            reservationRequest.getParkingSpotId(),
+            requestedStartTime,
+            reservationRequest.getDurationInHours() );
+            return new ResponseEntity<>(reservation,HttpStatus.CREATED);
+
+        }
+        catch(Exception e){
+            return new ResponseEntity<>("Error creating reservation" + e.getMessage(),HttpStatus.BAD_REQUEST);
+            
+        }
+        
     } 
     
     @GetMapping("/user/{userId}")

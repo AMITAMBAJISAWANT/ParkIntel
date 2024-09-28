@@ -42,6 +42,7 @@ public class User1 {
     )
     private Set<Role> roles =new HashSet<>();
 
-
+    @Column(nullable = false,unique = true)
+    private String email;
     
 }
