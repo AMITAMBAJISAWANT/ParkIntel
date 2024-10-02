@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.hibernate.annotations.DialectOverride.OverridesAnnotation;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,9 +28,10 @@ public class ReservationServiceImpl implements ReservationService  {
     
     @Override
     @Transactional
-    public Reservation createReservation(Long userId,Long parkingSpotId,LocalDateTime requestedStartTime, int durationInHours) throws Exception{
+    public Reservation createReservation(Long parkingSpotId,LocalDateTime requestedStartTime, int durationInHours) throws Exception{
         
-        User1 user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        String username=getCurrentAutenticatedUsername();
+        User1 user = userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("User not found"));
         
         ParkingSpot parkingSpot=parkingSpotRepository.findById(parkingSpotId).orElseThrow(()->new ResourceNotFoundException("Parking spot not found"));
          
@@ -74,6 +77,15 @@ public class ReservationServiceImpl implements ReservationService  {
     @Override
     public List<Reservation> getAllReservations() {
         return reservationRepository.findAll();
+    }
+    private String getCurrentAutenticatedUsername(){
+        Object principal=SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if(principal instanceof UserDetails){
+            return ((UserDetails)principal).getUsername();
+        }
+        else{
+            return principal.toString();
+        }
     }
 
     

@@ -34,7 +34,6 @@ public class ReservationController  {
         try{
             LocalDateTime requestedStartTime = LocalDateTime.parse(reservationRequest.getStartTime());
             Reservation reservation =reservationService.createReservation(
-            reservationRequest.getUserId(),
             reservationRequest.getParkingSpotId(),
             requestedStartTime,
             reservationRequest.getDurationInHours() );
