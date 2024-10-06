@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.hibernate.annotations.DialectOverride.OverridesAnnotation;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ import com.smartparking.smart_parking_management_system.repository.ParkingSpotRe
 import com.smartparking.smart_parking_management_system.repository.ReservationRepository;
 import com.smartparking.smart_parking_management_system.repository.UserRepository;
 
+import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -25,6 +27,7 @@ public class ReservationServiceImpl implements ReservationService  {
     private final ReservationRepository reservationRepository;
     private final UserRepository userRepository;
     private final ParkingSpotRepository parkingSpotRepository;
+    private final NotificationService notificationService;
     
     @Override
     @Transactional
@@ -36,7 +39,7 @@ public class ReservationServiceImpl implements ReservationService  {
         ParkingSpot parkingSpot=parkingSpotRepository.findById(parkingSpotId).orElseThrow(()->new ResourceNotFoundException("Parking spot not found"));
          
         if(!parkingSpot.isAvailable()){
-            throw new Exception("This parking spot is not currently available");
+            throw new IllegalStateException("This parking spot is not currently available");
         }
 
         if(requestedStartTime.isBefore(LocalDateTime.now())){
@@ -59,12 +62,13 @@ public class ReservationServiceImpl implements ReservationService  {
         reservation.setParkingSpot(parkingSpot);
         reservation.setStartTime(requestedStartTime);
         reservation.setEndTime(endTime);
-
-        Reservation savedReservation = reservationRepository.save(reservation);
-         
-      
-
-        return savedReservation;
+        reservationRepository.save(reservation);
+        
+        parkingSpot.setAvailable(false);
+        parkingSpotRepository.save(parkingSpot);
+        
+        notificationService.sendReservationConfirmation(user, parkingSpot, requestedStartTime, endTime);
+        return reservation;
 
     }
     
@@ -86,6 +90,30 @@ public class ReservationServiceImpl implements ReservationService  {
         else{
             return principal.toString();
         }
+    }
+
+    @Scheduled(fixedRate=60000)
+    public void checkForExpirations(){
+        LocalDateTime now=LocalDateTime.now();
+        List<Reservation> reservations=reservationRepository.findAll();
+
+        for(Reservation reservation:reservations){
+            Duration durationUntilEnd = Duration.between(now,reservation.getEndTime());
+            long minutesUntilExpiration = durationUntilEnd.toMinutes();
+
+            if(minutesUntilExpiration == 5){
+                User1 user=reservation.getUser();
+                ParkingSpot parkingSpot = reservation.getParkingSpot();
+                notificationService.sendExpirationReminder(user, parkingSpot,reservation.getEndTime());
+
+            }
+            if(minutesUntilExpiration<=0&&!reservation.getParkingSpot().isAvailable()){
+                ParkingSpot parkingSpot = reservation.getParkingSpot();
+                parkingSpot.setAvailable(true);
+                parkingSpotRepository.save(parkingSpot);
+            }
+        }
+
     }
 
     
