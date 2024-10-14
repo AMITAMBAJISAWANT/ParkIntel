@@ -42,7 +42,8 @@ public class AuthController {
     User1 user =new User1();
     user.setUsername(userRegistrationDTO.getUsername());
     user.setPassword(passwordEncoder.encode(userRegistrationDTO.getPassword()));
-
+    user.setEmail(userRegistrationDTO.getEmail());
+                                                                                       
     Role role = roleRepository.findByName("User"); 
     // if (role == null) {
     //     // If the role does not exist, create and save it
