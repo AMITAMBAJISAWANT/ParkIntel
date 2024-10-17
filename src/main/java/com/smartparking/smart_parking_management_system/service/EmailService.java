@@ -21,6 +21,7 @@ public class EmailService {
             helper.setTo(to);
             helper.setSubject(subject);
             helper.setText(text,true);
+            helper.setFrom("amitambajisawant1@gmail.com");
             mailSender.send(message);
 
         }

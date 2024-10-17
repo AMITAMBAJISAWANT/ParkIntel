@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.smartparking.smart_parking_management_system.dto.UserLoginDTO;
 import com.smartparking.smart_parking_management_system.dto.UserRegistrationDTO;
 import com.smartparking.smart_parking_management_system.model.Role;
 import com.smartparking.smart_parking_management_system.model.User1;
@@ -58,9 +60,9 @@ public class AuthController {
 
     }
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody UserRegistrationDTO userRegistrationDTO){
+    public ResponseEntity<String> login(@RequestBody UserLoginDTO userLoginDTO){
         Authentication authentication = authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(userRegistrationDTO.getUsername(), userRegistrationDTO.getPassword()));
+            new UsernamePasswordAuthenticationToken(userLoginDTO.getUsername(), userLoginDTO.getPassword()));
            SecurityContextHolder.getContext().setAuthentication(authentication);
            UserDetails userDetails= (UserDetails) authentication.getPrincipal();
            String jwt=jwtUtil.generateToken(userDetails);
