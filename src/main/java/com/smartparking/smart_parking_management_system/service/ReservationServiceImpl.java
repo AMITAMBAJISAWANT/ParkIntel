@@ -31,7 +31,7 @@ public class ReservationServiceImpl implements ReservationService  {
     
     @Override
     @Transactional
-    public Reservation createReservation(Long parkingSpotId,LocalDateTime requestedStartTime, int durationInHours) throws Exception{
+    public Reservation createReservation(Long parkingSpotId,LocalDateTime requestedStartTime, double durationInHours) throws Exception{
         
         String username=getCurrentAutenticatedUsername();
         User1 user = userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("User not found"));
@@ -46,8 +46,9 @@ public class ReservationServiceImpl implements ReservationService  {
             throw new Exception("You cannot book parking spot in the past");
 
         }
-
-        LocalDateTime endTime = requestedStartTime.plusHours(durationInHours);
+        long minutes = Math.round(durationInHours * 60);
+        LocalDateTime endTime = requestedStartTime.plusMinutes(minutes);
+        //LocalDateTime endTime = requestedStartTime.plusHours(durationInHours);
 
         List<Reservation> overlappingReservations = reservationRepository.findByParkingSpotAndEndTimeAfter(parkingSpot,LocalDateTime.now());
         for(Reservation reservation : overlappingReservations){

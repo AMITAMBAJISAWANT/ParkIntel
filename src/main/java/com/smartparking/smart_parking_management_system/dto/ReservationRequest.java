@@ -7,6 +7,6 @@ public class ReservationRequest  {
     // private Long userId;
     private Long parkingSpotId;
     private String startTime;
-    private int durationInHours;
+    private double durationInHours;
     
 }
