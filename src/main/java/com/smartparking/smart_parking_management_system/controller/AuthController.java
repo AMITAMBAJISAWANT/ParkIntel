@@ -1,6 +1,7 @@
 package com.smartparking.smart_parking_management_system.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,6 +21,7 @@ import com.smartparking.smart_parking_management_system.model.Role;
 import com.smartparking.smart_parking_management_system.model.User1;
 import com.smartparking.smart_parking_management_system.repository.RoleRepository;
 import com.smartparking.smart_parking_management_system.repository.UserRepository;
+import com.smartparking.smart_parking_management_system.service.UserService;
 import com.smartparking.smart_parking_management_system.util.JwtUtil;
 @RestController
 @RequestMapping("/auth")
@@ -35,12 +37,15 @@ public class AuthController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
-
+    
+    @Autowired
+    private UserService userService;
+    
     @Autowired
     private JwtUtil jwtUtil;
 
     @PostMapping("/register")
-    public String register(@RequestBody UserRegistrationDTO userRegistrationDTO){
+    public ResponseEntity<String> register(@RequestBody UserRegistrationDTO userRegistrationDTO){
     User1 user =new User1();
     user.setUsername(userRegistrationDTO.getUsername());
     user.setPassword(passwordEncoder.encode(userRegistrationDTO.getPassword()));
@@ -54,9 +59,18 @@ public class AuthController {
     //     roleRepository.save(role);
     // }
     user.getRoles().add(role);
-    userRepository.save(user);
 
-    return "User registered successfully";
+    try{
+        userService.registerUser(user);
+        return new ResponseEntity<>("User registration successful",HttpStatus.CREATED);
+
+    }
+    catch(Exception e){
+        return new ResponseEntity<>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+    
+
+    
 
     }
     @PostMapping("/login")
